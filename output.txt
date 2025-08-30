@@ -1,0 +1,1 @@
+Fake Images/19663.png[(83811, [np.float32(14.161589), np.float32(0.9999993)])]

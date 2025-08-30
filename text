@@ -1,0 +1,47 @@
+import os
+import torch
+from diffusers import FluxPipeline
+
+# Custom folder in your project
+model_folder = "Models/models--black-forest-labs--FLUX.1-schnell/snapshots/741f7c3ce8b383c54771c7003378a50191e9efe9"
+
+# Load the model — only missing files will be downloaded
+pipe_offline = FluxPipeline.from_pretrained(
+    model_folder,
+    torch_dtype=torch.bfloat16,
+    local_files_only=True
+)
+
+print(f"Model is ready in: {model_folder}")
+
+# Later, you can load it fully offline like this:
+pipe_offline = FluxPipeline.from_pretrained(
+    model_folder,
+    torch_dtype=torch.bfloat16,
+    local_files_only=True
+)
+
+
+import os
+import torch
+from diffusers import FluxPipeline
+
+# Custom folder in your project
+model_folder = os.path.join(os.getcwd(), "Models")
+os.makedirs(model_folder, exist_ok=True)
+
+# Load the model — only missing files will be downloaded
+pipe = FluxPipeline.from_pretrained(
+    "black-forest-labs/FLUX.1-schnell",
+    cache_dir=model_folder,   # store everything in your custom folder
+    torch_dtype=torch.bfloat16
+)
+
+print(f"Model is ready in: {model_folder}")
+
+# Later, you can load it fully offline like this:
+pipe_offline = FluxPipeline.from_pretrained(
+    model_folder,
+    torch_dtype=torch.bfloat16,
+    local_files_only=True
+)
