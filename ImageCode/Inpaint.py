@@ -14,7 +14,6 @@ if Inpaint_device == "cpu":
     pipe.enable_sequential_cpu_offload()
     pipe.vae.enable_slicing()
     pipe.vae.enable_tiling()
-pipe.to(torch.bfloat16)
 
 
 def inpaint_image(seed, prompt, image, mask, height, width, inferences, output_type='np'):
@@ -84,3 +83,6 @@ def inpaint_image(seed, prompt, image, mask, height, width, inferences, output_t
         # output_type="pt" # Tensor
     ).images[0]
     return out
+
+
+inpaint_image(0, "", img_to_pil("cup.png"), img_to_pil("cup_mask.png"), 512, 512, 1)
