@@ -9,6 +9,7 @@ from PIL import Image
 from collections import OrderedDict
 from copy import deepcopy
 from Functions import *
+from Config import device
 
 
 class BaseModel(nn.Module):
@@ -349,29 +350,22 @@ def preprocess_image(input_image: Image.Image, target_size=(224, 224)):
         transforms.ToTensor(),
         transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
     ])
-    image = transform(image).unsqueeze(0)
+    image = transform(image).unsqueeze(0).to(device)
     return image
 
 
 # Inference function
 def run_inference(input_pil: Image.Image):
-    """
-    returns 1 for fake and 0 for real
-    output, sig_output
-    """
-    try:
-        assert isinstance(input_pil, Image.Image)
-    except AssertionError:
-        print(type(input_pil))
-        raise AssertionError("Wrong input image type")
+    assert isinstance(input_pil, Image.Image), "Input must be PIL.Image"
     image = preprocess_image(input_pil)
-    image = image.cuda()
 
     with torch.no_grad():
-        output = model(image)#.sigmoid()
-    sig_output = output.sigmoid()
-    output = output.cpu().numpy()[0][0]
-    sig_output = sig_output.cpu().numpy()[0][0]
+        output = model(image)
+        sig_output = torch.sigmoid(output)
+
+    # only move to CPU at the end if you need numpy
+    output = output.squeeze().detach().cpu().numpy().item()
+    sig_output = sig_output.squeeze().detach().cpu().numpy().item()
     return [output, sig_output]
 
 
@@ -382,11 +376,12 @@ def get_model():
 model = resnet50(num_classes=1)
 
 ckpt_path = os.path.join(os.path.dirname(__file__), "NPR.pth")
-state_dict = torch.load(ckpt_path, map_location='cpu')['model']
+state_dict = torch.load(ckpt_path, map_location=device)['model']
 pretrained_dict = OrderedDict()
 for ki in state_dict.keys():
     pretrained_dict[ki[7:]] = deepcopy(state_dict[ki])
 model.load_state_dict(pretrained_dict, strict=True)
+model.to(device)
 
 model.cuda()
 model.eval()

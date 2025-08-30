@@ -15,9 +15,11 @@ from copy import deepcopy
 import random
 import os
 from Detectors.NPRBase import get_model
+from Config import device
+
 
 class BlackBoxExplainer:
-    def __init__(self, model, device='cuda', input_size=512):
+    def __init__(self, model, device=device, input_size=512):
         self.model = model
         self.device = device
         self.model.to(device)
@@ -112,7 +114,7 @@ class BlackBoxExplainer:
             return saliency_output
 
         return {
-            'saliency_map': saliency,
+            '-': saliency,
             'saliency_norm': more_normalization(saliency),
             'target_class': target_class,
             'class_name': self.class_names[target_class],
@@ -163,6 +165,6 @@ def get_top_saliency(saliency: np.ndarray, threshold=80):
     mask = np.zeros_like(saliency, dtype=np.uint8)
     mask[saliency >= threshold] = 255
     return mask
-explainer = BlackBoxExplainer(get_model(), device='cuda', input_size=224)
+explainer = BlackBoxExplainer(get_model(), device=device, input_size=224)
 
 

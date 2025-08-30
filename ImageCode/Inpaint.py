@@ -1,14 +1,14 @@
 import torch
 from diffusers import FluxFillPipeline
 from Functions import *
+from Config import device
 
 MODEL_PATH = "/home/tingray/PycharmProjects/Flux In Painting/Models/FLUX.1-Fill-dev/snapshots/Fill-dev"
-
 pipe = FluxFillPipeline.from_pretrained(
     MODEL_PATH,
     torch_dtype=torch.bfloat16,
     local_files_only=True
-)
+).to(device)
 cpu_use = True
 if cpu_use:
     pipe.enable_sequential_cpu_offload()
