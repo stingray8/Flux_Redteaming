@@ -1,20 +1,20 @@
 import torch
 from diffusers import FluxFillPipeline
 from Functions import *
-from Config import device
+from Config import *
 
 MODEL_PATH = "/home/tingray/PycharmProjects/Flux In Painting/Models/FLUX.1-Fill-dev/snapshots/Fill-dev"
 pipe = FluxFillPipeline.from_pretrained(
     MODEL_PATH,
     torch_dtype=torch.bfloat16,
     local_files_only=True
-).to(device)
-cpu_use = True
-if cpu_use:
+).to(Inpaint_device)
+
+if Inpaint_device == "cpu":
     pipe.enable_sequential_cpu_offload()
-pipe.vae.enable_slicing()
-pipe.vae.enable_tiling()
-pipe.to(torch.float16)
+    pipe.vae.enable_slicing()
+    pipe.vae.enable_tiling()
+pipe.to(torch.bfloat16)
 
 
 def inpaint_image(seed, prompt, image, mask, height, width, inferences, output_type='np'):

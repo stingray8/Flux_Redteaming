@@ -9,7 +9,7 @@ from PIL import Image
 from collections import OrderedDict
 from copy import deepcopy
 from Functions import *
-from Config import device
+from Config import *
 
 
 class BaseModel(nn.Module):
@@ -20,7 +20,7 @@ class BaseModel(nn.Module):
         self.isTrain = opt.isTrain
         self.lr = opt.lr
         self.save_dir = os.path.join(opt.checkpoints_dir, opt.name)
-        self.device = torch.device('cuda:{}'.format(opt.gpu_ids[0])) if opt.gpu_ids else torch.device('cpu')
+        self.device = NPRBase_device
 
     def save_networks(self, epoch):
         save_filename = 'model_epoch_%s.pth' % epoch
@@ -338,7 +338,7 @@ def resnet152(pretrained=False, **kwargs):
 
 model = resnet50(num_classes=1)
 ckpt_path = os.path.join(os.path.dirname(__file__), "model_epoch_last_3090.pth")
-model.load_state_dict(torch.load(ckpt_path, map_location='cpu'), strict=True)
+model.load_state_dict(torch.load(ckpt_path, map_location=NPRBase_device), strict=True)
 model.cuda()
 model.eval()
 
@@ -376,12 +376,12 @@ def get_model():
 model = resnet50(num_classes=1)
 
 ckpt_path = os.path.join(os.path.dirname(__file__), "NPR.pth")
-state_dict = torch.load(ckpt_path, map_location=device)['model']
+state_dict = torch.load(ckpt_path, map_location=NPRBase_device)['model']
 pretrained_dict = OrderedDict()
 for ki in state_dict.keys():
     pretrained_dict[ki[7:]] = deepcopy(state_dict[ki])
 model.load_state_dict(pretrained_dict, strict=True)
-model.to(device)
+model.to(NPRBase_device)
 
 model.cuda()
 model.eval()

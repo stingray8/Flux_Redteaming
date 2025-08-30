@@ -15,7 +15,7 @@ from copy import deepcopy
 import random
 import os
 from Detectors.NPRBase import get_model
-from Config import device
+from Config import *
 
 
 class BlackBoxExplainer:
@@ -165,6 +165,6 @@ def get_top_saliency(saliency: np.ndarray, threshold=80):
     mask = np.zeros_like(saliency, dtype=np.uint8)
     mask[saliency >= threshold] = 255
     return mask
-explainer = BlackBoxExplainer(get_model(), device=device, input_size=224)
+explainer = BlackBoxExplainer(get_model(), device=NPRBlackbox_device, input_size=224)
 
 
